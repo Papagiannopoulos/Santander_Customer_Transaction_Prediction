@@ -1,7 +1,5 @@
 
 #Satander Costumers
-#Sys.setenv(LANG = "en")
-#Sys.setlocale("LC_TIME", "English")
 options(digits = 8)
 #### Libraries & Path ####
 library(shiny); library(shinyWidgets); #library(shinydashboard); 
@@ -15,7 +13,6 @@ library(car); library(varrank)
 library(corrplot)
 library(lightgbm); library(caret); library(randomForest); library(xgboost);
 library(msaenet); library(glmnet); library(MASS);
-#install.packages("smotefamily", repos = "https://cran.r-project.org")
 library(parallel); library(doParallel); library(doRNG)
 library(smotefamily)
 library(fpc)
@@ -23,19 +20,6 @@ library(rgl); library(magick)
 
 #Path
 setwd("C:/Users/user/Desktop/2.V2_09_01_2025")
-#setwd("C:/Users/User/Desktop/Other/1.Kaggle/3.Santader Customers/V2_09_02_2025")
-
-lgb.param = list(task = "train", metric = "auc", boosting = "gbdt", tree_learner =  "serial",
-                 learning_rate = 0.04,
-                 feature_fraction_bynode = 0.9, feature_fraction = 0.1,
-                 force_col_wise = T,
-                 max_depth = -1,
-                 boost_from_average = F,
-                 min_data_in_leaf = 50, #min_sum_hessian_in_leaf = 10,
-                 num_leaves = 3,
-                 bagging_freq = 2, pos_bagging_fraction = 0.9, neg_bagging_fraction = 0.9 
-                 #num_threads = 8 #,max_bin = 255
-)
 
 #### Functions ####
 data_overview <- function(x, N_outliers){
