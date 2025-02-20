@@ -8,18 +8,7 @@ library(ggplot2); library(ggpubr)
 library(tidyverse)
 library(stringr);
 library(xlsx); library(readxl)
-library(RNOmni); library(moments); library(pROC)
-library(car); library(varrank)
 library(corrplot)
-library(lightgbm); library(caret); library(randomForest); library(xgboost);
-library(msaenet); library(glmnet); library(MASS);
-library(parallel); library(doParallel); library(doRNG)
-library(smotefamily)
-library(fpc)
-library(rgl); library(magick)
-
-#Path
-setwd("C:/Users/user/Desktop/2.V2_09_01_2025")
 
 #### Functions ####
 data_overview <- function(x, N_outliers){
@@ -36,17 +25,13 @@ data_overview <- function(x, N_outliers){
                            MeanValues = apply(unscaled_continuous, 2, mean, na.rm = T),
                            Median = apply(scaled_continuous, 2, median, na.rm = T),
                            SD = apply(unscaled_continuous, 2, sd, na.rm = T),
-                           #sd2down = apply(scaled_continuous, 2, mean, na.rm = T) - 2*apply(continuous, 2, sd, na.rm = T),
                            Q2.2 = apply(scaled_continuous, 2, quantile, na.rm = T, 0.0225),
-                           #sd2up = apply(scaled_continuous, 2, mean, na.rm = T) + 2*apply(continuous, 2, sd, na.rm = T),
                            Q97.8 = apply(scaled_continuous, 2, quantile, na.rm = T, 0.9775),
                            Min = apply(scaled_continuous, 2, min, na.rm = T),
                            Max = apply(scaled_continuous, 2, max, na.rm = T),
                            `Mean of 2000 min values` = apply(scaled_continuous, 2, function(x){mean(sort(x, decreasing = F)[1:N_outliers])}),
                            `Mean of 2000 max values` = apply(scaled_continuous, 2, function(x){mean(sort(x, decreasing = T)[1:N_outliers])}),
                            `Number of Missing` = apply(scaled_continuous, 2, function(x){sum(is.na(x))/length(x)*100})
-                           #scaled_min = apply(scaled_continuous, 2, function(x){min(scale(x))}),
-                           #scaled_max = apply(scaled_continuous, 2, function(x){max(scale(x))})
   )
   continuous <- continuous %>% arrange(desc(Max), desc(Min))
   continuous[sapply(continuous, is.numeric)] <- apply(continuous[sapply(continuous, is.numeric)], 2, round, digit)
@@ -81,30 +66,23 @@ histogram <- function(data, x, fill){
 }
 
 #### Import Data & Processing ####
-train <- read.csv("Data/train.csv")
-test <- read.csv("Data/test.csv")
+train <- read.csv("train.csv")
+test <- read.csv("test.csv")
 test <- test %>% mutate(target = NA, .after = ID_code)
 satander <- rbind(train, test)
 satander <- satander %>% mutate(target = as.character(target))
 
 #Descriptives
-#descr_all <- satander %>% data_overview(2000)
-#descr_tr <- satander %>% filter(!is.na(target)) %>% data_overview(2000)
-#descr_ts <- satander %>% filter(is.na(target)) %>% data_overview(2000)
-#descr_tr_0 <- satander %>% filter(target == 0) %>% data_overview(2000)
-#descr_tr_1 <- satander %>% filter(target == 1) %>% data_overview(2000)
-#descr_all <- descr_all$scaled_cont
-#descr_tr <- descr_tr$scaled_cont
-#descr_ts <- descr_ts$scaled_cont
-#descr_tr_0 <- descr_tr_0$scaled_cont
-#descr_tr_1 <- descr_tr_1$scaled_cont
-#write.table(descr_all, "Rshiny/descr_all.txt")
-#write.table(descr_tr, "Rshiny/descr_tr.txt"); write.table(descr_ts, "Rshiny/descr_ts.txt")
-#write.table(descr_tr_0, "Rshiny/descr_tr_0.txt"); write.table(descr_tr_1, "Rshiny/descr_tr_1.txt")
-
-descr_all <- read.table("Rshiny/descr_all.txt")
-descr_tr <- read.table("Rshiny/descr_tr.txt"); descr_ts <- read.table("Rshiny/descr_ts.txt")
-descr_tr_0 <- read.table("Rshiny/descr_tr_0.txt"); descr_tr_1 <- read.table("Rshiny/descr_tr_1.txt")
+descr_all <- satander %>% data_overview(2000)
+descr_tr <- satander %>% filter(!is.na(target)) %>% data_overview(2000)
+descr_ts <- satander %>% filter(is.na(target)) %>% data_overview(2000)
+descr_tr_0 <- satander %>% filter(target == 0) %>% data_overview(2000)
+descr_tr_1 <- satander %>% filter(target == 1) %>% data_overview(2000)
+descr_all <- descr_all$scaled_cont
+descr_tr <- descr_tr$scaled_cont
+descr_ts <- descr_ts$scaled_cont
+descr_tr_0 <- descr_tr_0$scaled_cont
+descr_tr_1 <- descr_tr_1$scaled_cont
 
 # Shiny App ####
 #Create descriptive table for Shiny
@@ -122,19 +100,19 @@ ui <- fluidPage(theme = shinytheme("united"),
                                #Search Dataset
                                pickerInput("dataset", "Dataset",
                                            choices = dataset, multiple = F,selected = dataset[1],
-                                           options=pickerOptions(liveSearch=TRUE,liveSearchNormalize=TRUE,
+                                           options=pickerOptions(liveSearch=F,liveSearchNormalize=F,
                                                                  liveSearchStyle="contains",
                                                                  noneResultsText="No results found")),
                                #Choose Variables
                                pickerInput("vars",label = "Features",
                                            choices = vars, multiple = T, selected = "var_0",
-                                           options=pickerOptions(liveSearch=TRUE,liveSearchNormalize=TRUE,
+                                           options=pickerOptions(liveSearch=TRUE,liveSearchNormalize=F,
                                                                  liveSearchStyle="contains",
                                                                  noneResultsText="No results found")),
                                #Compare Datasets
                                pickerInput("compare","Compare",
                                            choices = compare,  multiple = F, selected = compare[1],
-                                           options=pickerOptions(liveSearch=TRUE,liveSearchNormalize=TRUE,
+                                           options=pickerOptions(liveSearch=F,liveSearchNormalize=F,
                                                                  liveSearchStyle="contains",
                                                                  noneResultsText="No results found")),
                                #Metrics
@@ -143,19 +121,18 @@ ui <- fluidPage(theme = shinytheme("united"),
                                #Sort of Table
                                radioButtons("sort", h3("Sort"),
                                             choices = c("Descending", "Ascending"),selected = "Descending")),
-                               
-                  #checkboxGroupInput(inputId = "checkGroup",label = h3("Metrics"),
-                               #                    choices = as.list(metrics), selected = c("Mean"))),
                   
                   mainPanel(width=10, fluidRow(tabsetPanel(tabPanel("EDA - Total Descriptives",
-                                                                    column(7, splitLayout(plotOutput("figures1",width = "99%", height = "780px"))),
-                                                                    column(3, tableOutput("DescTable1"))),
+                                                                    column(6, splitLayout(plotOutput("figures1", height = "720px"))),
+                                                                    column(2, tableOutput("DescTable1"))),
                                                           tabPanel("EDA - Dataset Comparisons",
-                                                                   column(7, splitLayout(plotOutput("figures2",width = "99%", height = "780px"))),
+                                                                   column(7, splitLayout(plotOutput("figures2", height = "720px"))),
                                                                    column(3, tableOutput("DescTable2"))),
                                                           tabPanel("EDA - Variable Comparisons",
                                                                    column(5, splitLayout(plotOutput("figures3a"))),
-                                                                   column(5, splitLayout(plotOutput("figures3b")))),
+                                                                   column(5, splitLayout(plotOutput("figures3b"))),
+                                                                   br(),
+                                                                   plotOutput("figures3c")),
                                                           tabPanel("EDA - Variable Correlations",
                                                                    splitLayout(plotOutput("figures4",width = "99%", height = "780px")))
                                                           ))
@@ -179,11 +156,13 @@ server <- function(input, output, session){
   
   #Compare Datasets
   observeEvent(input$vars,{
-    choice1 <- input$vars
+    if(is.null(input$vars)){
+      input$vars <- vars[1]
+    }
     updatePickerInput(session=session, inputId = "vars",label="Features",
-                      choices = vars, selected = choice1, clearOptions=F)
+                      choices = c(input$vars, vars[!(vars %in% input$vars)]), selected = input$vars, clearOptions=F)
   }, ignoreInit = T, ignoreNULL = FALSE)
-  
+
   #Metrics
   observeEvent(input$select,{
     choice1 <- input$select
@@ -202,9 +181,11 @@ server <- function(input, output, session){
                       selected = choice1[1])
   }, ignoreInit = T, ignoreNULL = FALSE)
   
-  R1 <- reactive({list(input$dataset, input$vars)})
-  R2 <- reactive({list(input$compare, input$vars, input$select, input$sort)})
-  R3 <- reactive({list(input$compare, input$vars)})
+  Rempty <- reactive(({list()}))
+  R1 <- reactive({list(input$dataset)})
+  R2 <- reactive({list(input$compare, input$select, input$sort)})
+  R3a <- reactive({list(input$compare)})
+  R3b <- reactive({list(input$vars)})
   
   #Panel 1
   #Plot
@@ -265,7 +246,7 @@ server <- function(input, output, session){
   
   #Panel 3
   #Plot
-  observeEvent(R3(), {
+  observeEvent(R3a(), {
     d1 <- satander %>% mutate(cat = factor(case_when(is.na(target) ~ 1, .default = 0), c(0,1), c("Train", "Test")))
     d2 <- satander %>% filter(!is.na(target)) %>% mutate(cat = factor(target, c(0, 1), c("No", "Yes")))
     if(input$compare %in% compare[1]){d <- d1}else{d <- d2}
@@ -275,26 +256,51 @@ server <- function(input, output, session){
     })
   })
   #Plot
-  observeEvent(R3(), {
+  observeEvent(R3b(), {
     var <- input$vars[length(input$vars)]
     d <- train
     names(d)[which(names(d) %in% var)] <- "var"
-    d <- as.data.frame(d %>% group_by(target, var) %>% summarise(count = n())) %>% arrange(var)
-    d <- reshape(d, direction = "wide", timevar = "target", idvar = "var")
+    d1 <- as.data.frame(d %>% group_by(target, var) %>% summarise(count = n())) %>% arrange(var)
+    d <- reshape(d1, direction = "wide", timevar = "target", idvar = "var")
     d[is.na(d)] <- 0
     d$count <- d$count.0 + d$count.1
     d$perc.0 <- d$count.0/d$count; d$perc.1 <- d$count.1/d$count
     d_tr <- d %>% dplyr::select(var, count, perc.1)
     
+    logit.mod <- glm(target ~ var, data = d1, family = "binomial")
+    d_tr$pred <- predict(logit.mod, newdata = d_tr, type = "response")
+    logit.mod.inter <- glm(target ~ var*count, data = d1, family = "binomial")
+    d_tr$pred.inter <- predict(logit.mod.inter, newdata = d_tr, type = "response")
+    
     output$figures3b <- renderPlot({
-      ggplot(d_tr, aes(y = perc.1, x = var)) + geom_smooth(se = T) + labs(y = paste0("P(Target = 1/X = ", var), x = var)+ theme_bw()+
-        theme(axis.title = element_text(size = 14), axis.text = element_text(size = 12, face = "bold"))
+      ggplot(d_tr, aes(y = perc.1, x = var)) +
+        geom_smooth(se = F, method = "loess", span = 0.1)+
+        labs(x = var, y = paste0("Prob(target=1/",var, ")"))+
+        theme(axis.text = element_text(size = 12, face = "bold"), axis.title = element_text(size = 14))
+      })
+    
+    output$figures3c <- renderPlot({
+      g1 <- ggplot(d_tr, aes(x = var, y = 0, fill= pred)) +
+        geom_tile(aes(width = 1, height = 1)) +
+        labs(y = "", x = var,  fill = paste0("Prob(target = 1/", var,")"))+
+        theme_minimal()+guides(fill = "none")+
+        theme(axis.text.y = element_blank(), axis.ticks = element_blank(),panel.grid = element_blank(),
+              axis.text = element_text(size = 12, face = "bold"), axis.title = element_text(size = 14))
+
+      g2 <- ggplot(d_tr, aes(var, count, fill= pred.inter)) + 
+        geom_tile(aes(width = 1, height = 1))+
+        labs(y = "Count of Values", x = var, fill = paste0("Prob(target = 1/", var,")"))+
+        theme_minimal()+guides(fill = "none")+
+        theme(axis.ticks = element_blank(), panel.grid = element_blank(),
+              axis.text = element_text(size = 12, face = "bold"), axis.title = element_text(size = 14))
+        
+      ggarrange(g1, g2, nrow = 1, ncol = 2)
     })
   })
   
   #Panel 4
   #Plot
-  observeEvent(R3(), {
+  observeEvent(Rempty(), {
     corr <- train %>% dplyr::select(-c(ID_code, target)) %>% cor(method = "pearson")
     corr <- corr - diag(1, nrow = nrow(corr))
     
