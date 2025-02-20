@@ -97,47 +97,47 @@ metrics <- names(descr_all)[-1]
 #Frontend
 ui <- fluidPage(theme = shinytheme("united"),
                 sidebarLayout(position = "left",
-                  sidebarPanel(width = 2,
-                               #Search Dataset
-                               pickerInput("dataset", "Dataset",
-                                           choices = dataset, multiple = F,selected = dataset[1],
-                                           options=pickerOptions(liveSearch=F,liveSearchNormalize=F,
-                                                                 liveSearchStyle="contains",
-                                                                 noneResultsText="No results found")),
-                               #Choose Variables
-                               pickerInput("vars",label = "Features",
-                                           choices = vars, multiple = T, selected = "var_0",
-                                           options=pickerOptions(liveSearch=TRUE,liveSearchNormalize=F,
-                                                                 liveSearchStyle="contains",
-                                                                 noneResultsText="No results found")),
-                               #Compare Datasets
-                               pickerInput("compare","Compare",
-                                           choices = compare,  multiple = F, selected = compare[1],
-                                           options=pickerOptions(liveSearch=F,liveSearchNormalize=F,
-                                                                 liveSearchStyle="contains",
-                                                                 noneResultsText="No results found")),
-                               #Metrics
-                               selectInput("select", "Metrics",
-                                           choices = metrics, multiple = F, selected = "Mean"),
-                               #Sort of Table
-                               radioButtons("sort", h3("Sort"),
-                                            choices = c("Descending", "Ascending"),selected = "Descending")),
-                  
-                  mainPanel(width=10, fluidRow(tabsetPanel(tabPanel("EDA - Total Descriptives",
-                                                                    column(6, splitLayout(plotOutput("figures1", height = "720px"))),
-                                                                    column(2, tableOutput("DescTable1"))),
-                                                          tabPanel("EDA - Dataset Comparisons",
-                                                                   column(7, splitLayout(plotOutput("figures2", height = "720px"))),
-                                                                   column(3, tableOutput("DescTable2"))),
-                                                          tabPanel("EDA - Variable Comparisons",
-                                                                   column(5, splitLayout(plotOutput("figures3a"))),
-                                                                   column(5, splitLayout(plotOutput("figures3b"))),
-                                                                   br(),
-                                                                   plotOutput("figures3c")),
-                                                          tabPanel("EDA - Variable Correlations",
-                                                                   splitLayout(plotOutput("figures4",width = "99%", height = "780px")))
-                                                          ))
-                  )
+                              sidebarPanel(width = 2,
+                                           #Search Dataset
+                                           pickerInput("dataset", "Dataset",
+                                                       choices = dataset, multiple = F,selected = dataset[1],
+                                                       options=pickerOptions(liveSearch=F,liveSearchNormalize=F,
+                                                                             liveSearchStyle="contains",
+                                                                             noneResultsText="No results found")),
+                                           #Choose Variables
+                                           pickerInput("vars",label = "Features",
+                                                       choices = vars, multiple = T, selected = "var_0",
+                                                       options=pickerOptions(liveSearch=TRUE,liveSearchNormalize=F,
+                                                                             liveSearchStyle="contains",
+                                                                             noneResultsText="No results found")),
+                                           #Compare Datasets
+                                           pickerInput("compare","Compare",
+                                                       choices = compare,  multiple = F, selected = compare[1],
+                                                       options=pickerOptions(liveSearch=F,liveSearchNormalize=F,
+                                                                             liveSearchStyle="contains",
+                                                                             noneResultsText="No results found")),
+                                           #Metrics
+                                           selectInput("select", "Metrics",
+                                                       choices = metrics, multiple = F, selected = "Mean"),
+                                           #Sort of Table
+                                           radioButtons("sort", h3("Sort"),
+                                                        choices = c("Descending", "Ascending"),selected = "Descending")),
+                              
+                              mainPanel(width=10, fluidRow(tabsetPanel(tabPanel("EDA - Total Descriptives",
+                                                                                column(6, splitLayout(plotOutput("figures1", height = "720px"))),
+                                                                                column(2, tableOutput("DescTable1"))),
+                                                                       tabPanel("EDA - Dataset Comparisons",
+                                                                                column(7, splitLayout(plotOutput("figures2", height = "720px"))),
+                                                                                column(3, tableOutput("DescTable2"))),
+                                                                       tabPanel("EDA - Variable Comparisons",
+                                                                                column(5, splitLayout(plotOutput("figures3a"))),
+                                                                                column(5, splitLayout(plotOutput("figures3b"))),
+                                                                                br(),
+                                                                                plotOutput("figures3c")),
+                                                                       tabPanel("EDA - Variable Correlations",
+                                                                                splitLayout(plotOutput("figures4",width = "99%", height = "780px")))
+                              ))
+                              )
                 )
 )
 
@@ -163,7 +163,7 @@ server <- function(input, output, session){
     updatePickerInput(session=session, inputId = "vars",label="Features",
                       choices = c(input$vars, vars[!(vars %in% input$vars)]), selected = input$vars, clearOptions=F)
   }, ignoreInit = T, ignoreNULL = FALSE)
-
+  
   #Metrics
   observeEvent(input$select,{
     choice1 <- input$select
@@ -177,9 +177,9 @@ server <- function(input, output, session){
   observeEvent(input$sort,{
     choice1 <- input$sort
     updateRadioButtons(session=session,
-                      inputId = "sort",label="Sort",
-                      choices =  c("Descending", "Ascending"),
-                      selected = choice1[1])
+                       inputId = "sort",label="Sort",
+                       choices =  c("Descending", "Ascending"),
+                       selected = choice1[1])
   }, ignoreInit = T, ignoreNULL = FALSE)
   
   Rempty <- reactive(({list()}))
@@ -239,8 +239,8 @@ server <- function(input, output, session){
     d <- d[, c(1, which(grepl(input$select, names(d), fixed = T)))]
     names(d) <- c("Feature", cols)
     d$Differences <- d[,2] - d[,3]
-
-        output$DescTable2 <- renderTable({
+    
+    output$DescTable2 <- renderTable({
       case_when(input$sort %in% "Descending" ~ d %>% arrange(desc(Differences)), .default = d %>% arrange(Differences))
     }, rownames = F)
   })
@@ -251,7 +251,7 @@ server <- function(input, output, session){
     d1 <- satander %>% mutate(cat = factor(case_when(is.na(target) ~ 1, .default = 0), c(0,1), c("Train", "Test")))
     d2 <- satander %>% filter(!is.na(target)) %>% mutate(cat = factor(target, c(0, 1), c("No", "Yes")))
     if(input$compare %in% compare[1]){d <- d1}else{d <- d2}
-
+    
     output$figures3a <- renderPlot({
       histogram(d, x = input$vars[length(input$vars)], "cat") + labs(fill = "")
     })
@@ -278,23 +278,23 @@ server <- function(input, output, session){
         geom_smooth(se = F, method = "loess", span = 0.1)+
         labs(x = var, y = paste0("Prob(target=1/",var, ")"))+
         theme(axis.text = element_text(size = 12, face = "bold"), axis.title = element_text(size = 14))
-      })
+    })
     
     output$figures3c <- renderPlot({
       g1 <- ggplot(d_tr, aes(x = var, y = 0, fill= pred)) +
         geom_tile(aes(width = 1, height = 1)) +
-        labs(y = "", x = var,  fill = paste0("Prob(target = 1/", var,")"))+
+        labs(y = "", x = var,  title = paste0("Prob(target = 1/", var,")"))+
         theme_minimal()+guides(fill = "none")+
         theme(axis.text.y = element_blank(), axis.ticks = element_blank(),panel.grid = element_blank(),
               axis.text = element_text(size = 12, face = "bold"), axis.title = element_text(size = 14))
-
+      
       g2 <- ggplot(d_tr, aes(var, count, fill= pred.inter)) + 
         geom_tile(aes(width = 1, height = 1))+
-        labs(y = "Count of Values", x = var, fill = paste0("Prob(target = 1/", var,")"))+
+        labs(y = "Count of Values", x = var, title = paste0("Prob(target = 1/", var," * counts of values)"))+
         theme_minimal()+guides(fill = "none")+
         theme(axis.ticks = element_blank(), panel.grid = element_blank(),
               axis.text = element_text(size = 12, face = "bold"), axis.title = element_text(size = 14))
-        
+      
       ggarrange(g1, g2, nrow = 1, ncol = 2)
     })
   })
@@ -305,10 +305,10 @@ server <- function(input, output, session){
     corr <- train %>% dplyr::select(-c(ID_code, target)) %>% cor(method = "pearson")
     corr <- corr - diag(1, nrow = nrow(corr))
     
-      output$figures4 <- renderPlot({
-        corrplot(corr = corr, type = "full", order = "AOE", tl.cex = 1, tl.col = "black", method = "color", diag = F,
-                 col.lim = c(min(corr), max(corr)), is.corr = T, col = colorRampPalette(c("blue", "white", "red3"))(100))
-      })
+    output$figures4 <- renderPlot({
+      corrplot(corr = corr, type = "full", order = "AOE", tl.cex = 1, tl.col = "black", method = "color", diag = F,
+               col.lim = c(min(corr), max(corr)), is.corr = T, col = colorRampPalette(c("blue", "white", "red3"))(100))
+    })
   })
 }
 
