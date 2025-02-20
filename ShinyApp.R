@@ -9,6 +9,7 @@ library(tidyverse)
 library(stringr);
 library(xlsx); library(readxl)
 library(corrplot)
+library(moments)
 
 #### Functions ####
 data_overview <- function(x, N_outliers){
