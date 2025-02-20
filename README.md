@@ -14,3 +14,6 @@ The task is to predict the value of “target” column in the test set.
 
 #### Data Availability
 The [data](https://www.kaggle.com/competitions/santander-customer-transaction-prediction/data) provided for this competition has the same structure as the real data where Santander has available to solve this problem.
+
+#### Reproducibility
+After downloading the data, set your local path where you have included the data run the codes
