@@ -11,7 +11,7 @@ library(xlsx); library(readxl)
 library(corrplot)
 library(moments)
 
-#### Functions ####
+#### Functions ###
 data_overview <- function(x, N_outliers){
   continuous <- x[sapply(x[1:100,], is.numeric)]
   categorical <- x[!sapply(x[1:100,], is.numeric)]
