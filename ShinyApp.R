@@ -272,7 +272,7 @@ server <- function(input, output, session){
     d_tr$pred <- predict(logit.mod, newdata = d_tr, type = "response")
     #Interaction
     exp_d <- expand.grid(var = unique(d_tr$var),count = seq(min(d_tr$count), max(d_tr$count),1))
-    logit.mod.inter <- glm(target ~ var*count, data = d1, family = "binomial")
+    logit.mod.inter <- glm(target ~ var*scale(count), data = d1, family = "binomial")
     exp_d$pred.inter <- predict(logit.mod.inter, newdata = exp_d, type = "response")
     
     output$figures3b <- renderPlot({
