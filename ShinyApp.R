@@ -11,7 +11,7 @@ library(xlsx); library(readxl)
 library(corrplot)
 library(moments)
 
-#### Functions ###
+#### Functions ####
 data_overview <- function(x, N_outliers){
   continuous <- x[sapply(x[1:100,], is.numeric)]
   categorical <- x[!sapply(x[1:100,], is.numeric)]
@@ -95,7 +95,7 @@ vars <- descr_all$feature[order(as.numeric(str_remove(descr_all$feature, "var_")
 metrics <- names(descr_all)[-1]
 
 #Frontend
-ui <- fluidPage(theme = shinytheme("united"),
+ui <- fluidPage(theme = shinytheme("sandstone"),
                 sidebarLayout(position = "left",
                               sidebarPanel(width = 2,
                                            #Search Dataset
@@ -267,15 +267,17 @@ server <- function(input, output, session){
     d$count <- d$count.0 + d$count.1
     d$perc.0 <- d$count.0/d$count; d$perc.1 <- d$count.1/d$count
     d_tr <- d %>% dplyr::select(var, count, perc.1)
-    
+    #Univariate
     logit.mod <- glm(target ~ var, data = d1, family = "binomial")
     d_tr$pred <- predict(logit.mod, newdata = d_tr, type = "response")
+    #Interaction
+    exp_d <- expand.grid(var = unique(d_tr$var),count = seq(min(d_tr$count), max(d_tr$count),1))
     logit.mod.inter <- glm(target ~ var*count, data = d1, family = "binomial")
-    d_tr$pred.inter <- predict(logit.mod.inter, newdata = d_tr, type = "response")
+    exp_d$pred.inter <- predict(logit.mod.inter, newdata = exp_d, type = "response")
     
     output$figures3b <- renderPlot({
       ggplot(d_tr, aes(y = perc.1, x = var)) +
-        geom_smooth(se = F, method = "loess", span = 0.1)+
+        geom_smooth(se = F, method = "loess", span = 0.1)+ ylim(c(0,NA))+
         labs(x = var, y = paste0("Prob(target=1/",var, ")"))+
         theme(axis.text = element_text(size = 12, face = "bold"), axis.title = element_text(size = 14))
     })
@@ -285,11 +287,13 @@ server <- function(input, output, session){
         geom_tile(aes(width = 1, height = 1)) +
         labs(y = "", x = var,  title = paste0("Prob(target = 1/", var,")"))+
         theme_minimal()+guides(fill = "none")+
+        scale_fill_gradient2(low = "pink", high = "red3", mid = "blue3", midpoint = 0.5, limits = c(0,1))+
         theme(axis.text.y = element_blank(), axis.ticks = element_blank(),panel.grid = element_blank(),
               axis.text = element_text(size = 12, face = "bold"), axis.title = element_text(size = 14))
       
-      g2 <- ggplot(d_tr, aes(var, count, fill= pred.inter)) + 
+      g2 <- ggplot(exp_d, aes(var, count, fill= pred.inter)) + 
         geom_tile(aes(width = 1, height = 1))+
+        scale_fill_gradient2(low = "pink", high = "red3", mid = "blue3", midpoint = 0.5, limits = c(0,1))+
         labs(y = "Count of Values", x = var, title = paste0("Prob(target = 1/", var," * counts of values)"))+
         theme_minimal()+guides(fill = "none")+
         theme(axis.ticks = element_blank(), panel.grid = element_blank(),
