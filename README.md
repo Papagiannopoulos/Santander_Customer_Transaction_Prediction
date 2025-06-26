@@ -15,9 +15,9 @@ To further familiarized with Shiny app, **all visualizations additionally create
 
 ### Table of Contents
 1. 🔍 **[ Dataset](#dataset)** - Data description & source
-2. 🧹 **[ Data Processing](#data-processing)** - Cleaning and feature engineering
-3. 🔁 **[ Reproducibility](#Reproducibility)** - Reproducibility steps
-4. 📦 **[ Requirements](#Requirements)** - Install dependencies
+2. 🧹 **[ Data Processing](#-data-processing)** - Cleaning and feature engineering
+3. 🔁 **[ Reproducibility](#-reproducibility)** - Reproducibility steps
+4. 📦 **[ Requirements](#-requirements)** - Install dependencies
 
 ## Dataset
 Dataset is anonymized containing 200 numeric feature variables, the binary “target” column, and a string “ID_code” column.
@@ -27,7 +27,7 @@ The task is to predict the value of “target” column in the test set.
 ## Evaluation
 Submissions are evaluated on the area under the ROC curve between the predicted probability and the observed target.
 
-🔁 ## Reproducibility
+## 🔁 Reproducibility
 1) Clone the repo:
 Run the following commands in terminal:  
 		git clone 'https://github.com/Papagiannopoulos/Santander_Customer_Transaction_Prediction.git'  
@@ -35,6 +35,6 @@ Run the following commands in terminal:
 2) Download the data & add them in your cloned repo
 3) Run the requirements.R
 
-📦 ## Requirements
+## 📦 Requirements
 - Before running the Shiny app.R, run the requirements script to install all necessary libraries
 - R version: 4.4.1 (2024-06-14 ucrt)
