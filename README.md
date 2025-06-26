@@ -14,25 +14,25 @@ To further familiarized with Shiny app, **all visualizations additionally create
 ## Project Structure
 
 ### Table of Contents
-1. 🔍 **[ Dataset](#dataset)** - Data description & source
-2. 🧹 **[ Data Processing](#-data-processing)** - Cleaning and feature engineering
-3. 🔁 **[ Reproducibility](#-reproducibility)** - Reproducibility steps
-4. 📦 **[ Requirements](#-requirements)** - Install dependencies
+1. 🔍 **[ Dataset](#dataset)** - Data description & source  
+2. 🧹 **[ Data Processing](#-data-processing)** - Cleaning and feature engineering  
+3. 🔁 **[ Reproducibility](#-reproducibility)** - Reproducibility steps  
+4. 📦 **[ Requirements](#-requirements)** - Install dependencies  
 
 ## Dataset
-Dataset is anonymized containing 200 numeric feature variables, the binary “target” column, and a string “ID_code” column.
+Dataset is anonymized containing 200 numeric feature variables, the binary “target” column, and a string “ID_code” column.  
 The task is to predict the value of “target” column in the test set.  
 - **[Download source](https://www.kaggle.com/competitions/santander-customer-transaction-prediction/data) provided for this competition has the same structure as the real data where Santander has available to solve this problem.**
 
 ## Evaluation
-Submissions are evaluated on the area under the ROC curve between the predicted probability and the observed target.
+Submissions are evaluated on the Area Under the Curve (AUC) between the predicted probability and the observed target.
 
 ## 🔁 Reproducibility
-1) Clone the repo:
-Run the following commands in terminal:  
+1) Clone the repo!  
+Run the following commands in terminal:    
 		git clone 'https://github.com/Papagiannopoulos/Santander_Customer_Transaction_Prediction.git'  
 		cd 'Santander_Customer_Transaction_Prediction'
-2) Download the data & add them in your cloned repo
+2) Download the data & add them in your cloned repo  
 3) Run the requirements.R
 
 ## 📦 Requirements
