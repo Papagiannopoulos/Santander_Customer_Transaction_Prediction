@@ -1,19 +1,40 @@
 ## Which customers will make a specific transaction in the future?
 
-This repository referred to the second most popular [Kaggle competition]( https://www.kaggle.com/c/santander-customer-transaction-prediction), where I scored in the top 8% Global rank.
-In this imbalanced classification problem, I identified which customers will make a specific transaction in the future, irrespective of the amount of money transacted.
-I have included codes (Rscript, Rmarkdown, ShinyApp) where I am describing all the steps I followed (data preprocessing, EDA, feature engineering, model development).
-The models I used was logistic regressions and LightGBM.
+**Aim**: Identify which customers will make a specific transaction in the future
 
-#### Evaluation
+## Project Summary
+
+This project referred to the 2nd most popular [Kaggle competition]( https://www.kaggle.com/c/santander-customer-transaction-prediction),
+where ***i scored at the top 8% Global rank***.  
+In this imbalanced classification problem, **data are anonymized**.  
+I performed a *deep EDA and data manipulation* including preprocessing & feature engineering
+to understan the underlying data pattenrs, building predictive models such as lightGMB and logisting regression.  
+To further familiarized with Shiny app, **all visualizations additionally created using Rshiny**.
+
+## Project Structure
+
+### Table of Contents
+1. 🔍 **[ Dataset](#dataset)** - Data description & source
+2. 🧹 **[ Data Processing](#data-processing)** - Cleaning and feature engineering
+3. 🔁 **[ Reproducibility](#Reproducibility)** - Reproducibility steps
+4. 📦 **[ Requirements](#Requirements)** - Install dependencies
+
+## Dataset
+Dataset is anonymized containing 200 numeric feature variables, the binary “target” column, and a string “ID_code” column.
+The task is to predict the value of “target” column in the test set.  
+- **[Download source]**(https://www.kaggle.com/competitions/santander-customer-transaction-prediction/data) provided for this competition has the same structure as the real data where Santander has available to solve this problem.**
+
+## Evaluation
 Submissions are evaluated on the area under the ROC curve between the predicted probability and the observed target.
 
-#### Dataset Description
-Dataset is anonymized containing 200 numeric feature variables, the binary “target” column, and a string “ID_code” column.
-The task is to predict the value of “target” column in the test set.
+## 🔁 Reproducibility
+1) Clone the repo:
+Run the following commands in terminal:  
+		git clone 'https://github.com/Papagiannopoulos/Santander_Customer_Transaction_Prediction.git'
+		cd 'Santander_Customer_Transaction_Prediction'
+2) Download the data & add them in your cloned repo
+3) Run the requirements.R
 
-#### Data Availability
-The [data](https://www.kaggle.com/competitions/santander-customer-transaction-prediction/data) provided for this competition has the same structure as the real data where Santander has available to solve this problem.
-
-#### Reproducibility
-After downloading the data, set your local path where you have included the data run the codes
+## 📦 Requirements
+- Before running the Shiny app.R, run the requirements script to install all necessary libraries
+- R version: 4.4.1 (2024-06-14 ucrt)
